@@ -1,0 +1,74 @@
+services:
+  face:
+    build: .
+    # user: "${UID}:${GID}" # <-- این خط را اضافه کنید
+    image: face
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+      - ./.env:/app/.env
+      - ./outputs:/app/outputs
+      - ./src/ai/models:/app/src/ai/models
+      - ./src/ai/face_database:/app/src/ai/face_database
+      - ./dataset:/app/dataset
+      - ./logs:/app/logs
+    environment:
+      - REDIS_HOST=redis
+      - PYTHONPATH=/app/src
+    ports:
+      - "5001:5001"
+    env_file: .env
+    mem_limit: 8g
+    command: ["uvicorn", "src.api.endpoint:app", "--host", "0.0.0.0", "--port", "5001"]
+    restart: always
+
+  consumer:
+    build: .
+    image: face
+    depends_on:
+      - redis
+    volumes:
+      - ./src:/app/src
+      - ./.env:/app/.env
+      - ./outputs:/app/outputs
+      - ./src/ai/models:/app/src/ai/models
+      - ./src/ai/face_database:/app/src/ai/face_database
+    environment:
+      - REDIS_HOST=redis
+      - PYTHONPATH=/app/src
+    env_file: .env
+    mem_limit: 8g
+    command: ["python", "src/processing/consumer_manager.py"]
+    restart: always
+
+  # --- NEW SERVICE FOR SYNCHRONIZATION ---
+  syncer:
+    build: .
+    image: face
+    volumes:
+      - ./src:/app/src
+      - ./.env:/app/.env
+      # This shared volume is CRITICAL for accessing the SQLite database
+      - ./outputs:/app/outputs
+    environment:
+      - PYTHONPATH=/app/src
+    env_file: .env
+    # Syncing is not memory-intensive, so a lower limit is fine.
+    mem_limit: 512m
+    # The command to run the new synchronization script.
+    command: ["python", "src/database/sync_service.py"]
+    restart: always
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: redis-server --maxmemory 2gb --maxmemory-policy allkeys-lru
+    restart: always

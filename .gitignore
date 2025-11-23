@@ -1,0 +1,50 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Logs
+logs/
+*.log
+
+# Output videos & processed files
+outputs/
+*.mp4
+*.avi
+
+# Temporary frames and generated images
+processed_frames/
+frames/
+*.jpg
+*.png
+
+# Dataset folders (حجم زیاد)
+dataset/
+gallery/
+grid/
+grid_database/
+grid_5in5/
+
+# Docker volumes / tar files
+*.tar
+
+# Redis & face tarballs
+redis.tar
+face.tar
+
+# Virtual environments
+venv/
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+src/ai/models/buffalo_l/*
+src/ai/models/ir_models/*
+
+# Ignore .py and .sh ONLY in project root
+/*.py
+/*.sh
+
+view.html
