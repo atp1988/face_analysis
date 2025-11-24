@@ -1,5 +1,5 @@
 # Stateful Face Recognition System for Robust Real-Time Biometric
 
-## Demo Video
+## Demo (GIF Preview)
 
-<video src="assets/processed_video.mp4" width="600" controls></video>
+![Demo](assets/processed_video.gif)
