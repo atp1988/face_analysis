@@ -8,7 +8,6 @@ logs/
 
 # Output videos & processed files
 outputs/
-*.mp4
 *.avi
 
 # Temporary frames and generated images
